@@ -42,6 +42,7 @@ loss_func = nn.L1Loss()
 
 optimizer = torch.optim.SGD(params = model_0.parameters(), # parameters of target model to optimize
                             lr=0.01)
+                            
 epoch = 100 
 
 for i in range(0, epoch): 
@@ -52,7 +53,6 @@ for i in range(0, epoch):
     optimizer.step()
     optimizer.zero_grad()
     print(loss)
-
 
 
 
