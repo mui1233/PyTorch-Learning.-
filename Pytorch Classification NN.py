@@ -1,8 +1,7 @@
 from sklearn.datasets import make_circles
 import torch
 from torch import nn 
-
-
+''' 
 # Make 1000 samples 
 n_samples = 1000
 
@@ -66,52 +65,68 @@ for i in range(epochs):
     loss.backward()
     optimizer.step()
 
+'''
 
 
+#-----------------------------------------------------------------------------------------------------------
+# Multi-Class classification
+# Import dependencies
 
 
+from sklearn.datasets import make_blobs
+from sklearn.model_selection import train_test_split
+
+# Set the hyperparameters for data creation
+NUM_CLASSES = 4
+NUM_FEATURES = 2
+RANDOM_SEED = 42
+
+# 1. Create multi-class data
+X_blob, y_blob = make_blobs(n_samples=1000,
+    n_features=NUM_FEATURES, # X features
+    centers=NUM_CLASSES, # y labels 
+    cluster_std=1.5, # give the clusters a little shake up (try changing this to 1.0, the default)
+    random_state=RANDOM_SEED
+)
+
+# 2. Turn data into tensors
+X_blob = torch.from_numpy(X_blob).type(torch.float)
+y_blob = torch.from_numpy(y_blob).type(torch.LongTensor)
+
+# 3. Split into train and test sets
+X_blob_train, X_blob_test, y_blob_train, y_blob_test = train_test_split(X_blob,
+    y_blob,
+    test_size=0.2,
+    random_state=RANDOM_SEED
+)
 
 
+class Blob(nn.Module): 
+    def __init__(self, inp_features, out, hidden):
+        super().__init__()
+
+        self.linear_layer_stack = nn.Sequential(nn.Linear(inp_features, hidden), nn.ReLU(), nn.Linear(hidden, hidden), nn.ReLU(), nn.Linear(hidden, out))
+
+    def forward(self, x): 
+        return self.linear_layer_stack(x)
 
 
+b = Blob(NUM_FEATURES, NUM_CLASSES, 8)
 
+epochs = 2001
+loss_CE = nn.CrossEntropyLoss()
+optim = torch.optim.SGD(b.parameters(), lr = 0.01)
+for i in range(epochs): 
+    optim.zero_grad()
 
+    output = b.forward(X_blob_train) # Logits
+    blob_predictions = torch.softmax(output, dim=1)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    loss = loss_CE(output, y_blob_train,) # Cross Entropy Loss by default applies softmax onto the logits and then compares. 
+    loss.backward()
+    optim.step()
+    if i % 50 == 0: 
+        print(f"Epoch: {i}, Loss: {loss}")
 
 
 
