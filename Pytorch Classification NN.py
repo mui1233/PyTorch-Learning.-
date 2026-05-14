@@ -122,7 +122,7 @@ for i in range(epochs):
     output = b.forward(X_blob_train) # Logits
     blob_predictions = torch.softmax(output, dim=1)
 
-    loss = loss_CE(output, y_blob_train,) # Cross Entropy Loss by default applies softmax onto the logits and then compares. 
+    loss = loss_CE(output, y_blob_train) # Cross Entropy Loss by default applies softmax onto the logits and then compares. 
     loss.backward()
     optim.step()
     if i % 50 == 0: 
